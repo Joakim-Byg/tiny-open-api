@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: WeDoComputers dotnet API - OpenAPI 3.0
+  description: This is a sample API based on the OpenAPI 3.0 specification.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: jby@netic.dk
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://localhost/api/
+tags:
+  - name: Computer
+    description: Everything about computers
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+  - name: user
+    description: Operations about user
+paths:
+  /computer:
+    put:
+      tags:
+        - computer
+      summary: Update an existing computer
+      description: Update an existing computer by Id
+      operationId: updatecomputer
+      requestBody:
+        description: Update an existent computer in the storage
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Computer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Computer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Computer'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Computer'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Computer'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: computer not found
+        '422':
+          description: Validation exception
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+    post:
+      tags:
+        - computer
+      summary: Add a new computer to the storage
+      description: Add a new computer to the storage
+      operationId: addComputer
+      requestBody:
+        description: Create a new computer in the storage
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Computer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Computer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Computer'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Computer'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Computer'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+  /computer/findByStatus:
+    get:
+      tags:
+        - computer
+      summary: Finds computers by status
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findComputersByStatus
+      parameters:
+        - name: status
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: available
+            enum:
+              - available
+              - pending
+              - sold
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Computer'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Computer'
+        '400':
+          description: Invalid status value
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+  /computer/findByTags:
+    get:
+      tags:
+        - computer
+      summary: Finds computers by tags
+      description: >-
+        Multiple tags can be provided with comma separated strings. Use tag1,
+        tag2, tag3 for testing.
+      operationId: findComputersByTags
+      parameters:
+        - name: tags
+          in: query
+          description: Tags to filter by
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Computer'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Computer'
+        '400':
+          description: Invalid tag value
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+  /computer/{computerId}:
+    get:
+      tags:
+        - computer
+      summary: Find computer by ID
+      description: Returns a single computer
+      operationId: getComputerById
+      parameters:
+        - name: computerId
+          in: path
+          description: ID of computer to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Computer'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Computer'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: computer not found
+      security:
+        - api_key: []
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+    post:
+      tags:
+        - computer
+      summary: Updates an computer in the storage with form data
+      description: ''
+      operationId: updateComputerWithForm
+      parameters:
+        - name: computerId
+          in: path
+          description: ID of computer that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: query
+          description: Name of computer that needs to be updated
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status of computer that needs to be updated
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid input
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+    delete:
+      tags:
+        - computer
+      summary: Deletes an computer
+      description: delete an computer
+      operationId: deleteComputer
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: computerId
+          in: path
+          description: computer id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid computer value
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+  /computer/{computerId}/uploadImage:
+    post:
+      tags:
+        - computer
+      summary: uploads an image
+      description: ''
+      operationId: uploadFile
+      parameters:
+        - name: computerId
+          in: path
+          description: ID of computer to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: additionalMetadata
+          in: query
+          description: Additional Metadata
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      security:
+        - computerstorage_auth:
+            - write:computers
+            - read:computers
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Laptop
+      xml:
+        name: category
+    Computer:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: Dell
+        category:
+          $ref: '#/components/schemas/Category'
+        status:
+          type: string
+          description: computer status in the storage
+          enum:
+            - available
+            - pending
+            - sold
+      xml:
+        name: computer
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+  requestBodies:
+    Computer:
+      description: Computer object that needs to be added to the storage
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Computer'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Computer'
+  securitySchemes:
+    computerstorage_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://localhost:8080/oauth/authorize
+          scopes:
+            write:computers: modify computers in your account
+            read:computers: read data of your computers
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
